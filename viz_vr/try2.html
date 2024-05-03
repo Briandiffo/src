@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graphique VR avec Déplacement de Noeuds</title>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+</head>
+<body>
+    <a-scene keyboard-shortcuts="enterVREnabled: false">
+        <a-assets></a-assets>
+        <a-camera position="0 1.6 0"></a-camera>
+
+        <a-sky color="#ECECEC"></a-sky>
+
+        <!-- Créer les noeuds -->
+        <a-entity id="nodes">
+            <a-sphere id="node1" color="#ff0000" position="0 0 -5" radius="0.5" dragndrop></a-sphere>
+            <a-sphere id="node2" color="#00ff00" position="2 0 -5" radius="0.5" dragndrop></a-sphere>
+            <a-sphere id="node3" color="#0000ff" position="-2 0 -5" radius="0.5" dragndrop></a-sphere>
+            <a-sphere id="node4" color="#ffff00" position="0 2 -5" radius="0.5" dragndrop></a-sphere>
+            <a-sphere id="node5" color="#ff00ff" position="0 -2 -5" radius="0.5" dragndrop></a-sphere>
+            <a-sphere id="node6" color="#00ffff" position="2 2 -5" radius="0.5" dragndrop></a-sphere>
+        </a-entity>
+
+        <script>
+            AFRAME.registerComponent('dragndrop', {
+                init: function () {
+                    var el = this.el;
+                    var startPos;
+                    var startObjectPos;
+
+                    el.addEventListener('mousedown', function (event) {
+                        startPos = event.detail.intersection.point;
+                        startObjectPos = el.object3D.position.clone();
+                        el.sceneEl.canvas.addEventListener('mousemove', drag);
+                        el.sceneEl.canvas.addEventListener('mouseup', release);
+                    });
+
+                    function drag(event) {
+                        var intersectedPos = event.detail.intersection.point;
+                        var deltaPos = intersectedPos.clone().sub(startPos);
+                        el.object3D.position.copy(startObjectPos.clone().add(deltaPos));
+                    }
+
+                    function release() {
+                        el.sceneEl.canvas.removeEventListener('mousemove', drag);
+                        el.sceneEl.canvas.removeEventListener('mouseup', release);
+                    }
+                }
+            });
+        </script>
+    </a-scene>
+</body>
+</html>

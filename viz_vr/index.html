@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Graph Visualization in VR with Three.js</title>
+    <style>
+        body {
+            margin: 0;
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Initialisation de Three.js
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Création des sphères pour les nœuds avec des textures
+        const spheres = [];
+        const textureLoader = new THREE.TextureLoader();
+        const texture = textureLoader.load('https://threejs.org/examples/textures/uv_grid_opengl.jpg');
+        const sphereMaterial = new THREE.MeshBasicMaterial({ map: texture });
+
+        const NUM_SPHERES = 6; // Nombre de sphères
+
+        for (let i = 0; i < NUM_SPHERES; i++) {
+            const geometry = new THREE.SphereGeometry(0.2, 32, 32);
+            const sphere = new THREE.Mesh(geometry, sphereMaterial);
+
+            // Définition de positions aléatoires pour chaque sphère
+            sphere.position.set(
+                Math.random() * 4 - 2, // Valeurs aléatoires entre -2 et 2 pour x
+                Math.random() * 4 - 2, // Valeurs aléatoires entre -2 et 2 pour y
+                Math.random() * 4 - 2  // Valeurs aléatoires entre -2 et 2 pour z
+            );
+
+            spheres.push(sphere);
+            scene.add(sphere);
+        }
+
+        // Création des liens entre les sphères
+        const lineMaterial = new THREE.LineBasicMaterial({ color: 0xffffff });
+        const links = [];
+        for (let i = 0; i < spheres.length; i++) {
+            for (let j = i + 1; j < spheres.length; j++) {
+                const lineGeometry = new THREE.BufferGeometry().setFromPoints([spheres[i].position, spheres[j].position]);
+                const line = new THREE.Line(lineGeometry, lineMaterial);
+                scene.add(line);
+                links.push({ line, start: spheres[i], end: spheres[j] });
+            }
+        }
+
+        // Configuration de la caméra
+        camera.position.set(0, 0, 5);
+
+        // Déplacer la caméra en profondeur (avant/arrière)
+        const cameraSpeed = 0.05;
+
+        function moveCamera(direction, axis) {
+            camera.position[axis] += direction * cameraSpeed;
+        }
+
+        window.addEventListener('keydown', function (event) {
+            switch (event.keyCode) {
+                case 38: // Up arrow
+                    moveCamera(-1, 'z'); // Avancer
+                    break;
+                case 40: // Down arrow
+                    moveCamera(1, 'z'); // Reculer
+                    break;
+                case 37: // Left arrow
+                    moveCamera(-1, 'x'); // Déplacer vers la gauche
+                    break;
+                case 39: // Right arrow
+                    moveCamera(1, 'x'); // Déplacer vers la droite
+                    break;
+            }
+        });
+
+        // Gestion du déplacement des sphères
+        let isDragging = false;
+        let selectedSphere = null;
+
+        function onMouseMove(event) {
+            if (isDragging && selectedSphere) {
+                const raycaster = new THREE.Raycaster();
+                const mouse = new THREE.Vector2();
+                mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+                mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+
+                raycaster.setFromCamera(mouse, camera);
+                const planeZ = new THREE.Plane(new THREE.Vector3(0, 0, 1));
+                const intersectionPoint = new THREE.Vector3();
+                raycaster.ray.intersectPlane(planeZ, intersectionPoint);
+                selectedSphere.position.copy(intersectionPoint);
+
+                // Mettre à jour les liens
+                links.forEach(link => {
+                    link.line.geometry.setFromPoints([link.start.position, link.end.position]);
+                });
+            }
+        }
+
+        function onMouseDown(event) {
+            const raycaster = new THREE.Raycaster();
+            const mouse = new THREE.Vector2();
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(spheres);
+            if (intersects.length > 0) {
+                selectedSphere = intersects[0].object;
+                isDragging = true;
+            }
+        }
+
+        function onMouseUp(event) {
+            isDragging = false;
+            selectedSphere = null;
+        }
+
+        window.addEventListener('mousedown', onMouseDown, false);
+        window.addEventListener('mousemove', onMouseMove, false);
+        window.addEventListener('mouseup', onMouseUp, false);
+
+        // Redimensionner le rendu lorsque la taille de la fenêtre change
+        window.addEventListener('resize', function () {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Fonction pour animer la scène
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
+
+        animate();
+    </script>
+</body>
+
+</html>

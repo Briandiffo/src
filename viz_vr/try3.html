@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>VR Node Interaction</title>
+    <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+  </head>
+  <body>
+    <a-scene>
+      <!-- Caméra pour la VR -->
+      <a-camera position="0 1.6 0"></a-camera>
+      
+      <!-- Nœuds -->
+      <a-sphere id="node1" position="-2 1 -3" radius="0.5" color="red" draggable></a-sphere>
+      <a-sphere id="node2" position="0 1 -3" radius="0.5" color="blue" draggable></a-sphere>
+      <a-sphere id="node3" position="2 1 -3" radius="0.5" color="green" draggable></a-sphere>
+      <a-sphere id="node4" position="-2 1 -5" radius="0.5" color="yellow" draggable></a-sphere>
+      <a-sphere id="node5" position="0 1 -5" radius="0.5" color="purple" draggable></a-sphere>
+      <a-sphere id="node6" position="2 1 -5" radius="0.5" color="orange" draggable></a-sphere>
+      <a-sphere id="node7" position="-2 1 -7" radius="0.5" color="cyan" draggable></a-sphere>
+      <a-sphere id="node8" position="0 1 -7" radius="0.5" color="magenta" draggable></a-sphere>
+      <a-sphere id="node9" position="2 1 -7" radius="0.5" color="lime" draggable></a-sphere>
+      <a-sphere id="node10" position="4 1 -5" radius="0.5" color="pink" draggable></a-sphere>
+      
+      <!-- Liens -->
+      <a-entity id="link1" line="start: -2 1 -3; end: 0 1 -3; color: green"></a-entity>
+      <a-entity id="link2" line="start: 0 1 -3; end: 2 1 -3; color: green"></a-entity>
+      <a-entity id="link3" line="start: -2 1 -5; end: 0 1 -5; color: green"></a-entity>
+      <a-entity id="link4" line="start: 0 1 -5; end: 2 1 -5; color: green"></a-entity>
+      <a-entity id="link5" line="start: -2 1 -3; end: -2 1 -5; color: green"></a-entity>
+      <a-entity id="link6" line="start: 0 1 -3; end: 0 1 -5; color: green"></a-entity>
+      <a-entity id="link7" line="start: 2 1 -3; end: 2 1 -5; color: green"></a-entity>
+      <a-entity id="link8" line="start: -2 1 -5; end: -2 1 -7; color: green"></a-entity>
+      <a-entity id="link9" line="start: 0 1 -5; end: 0 1 -7; color: green"></a-entity>
+      <a-entity id="link10" line="start: 2 1 -5; end: 2 1 -7; color: green"></a-entity>
+      <a-entity id="link11" line="start: -2 1 -7; end: 0 1 -7; color: green"></a-entity>
+      <a-entity id="link12" line="start: 0 1 -7; end: 2 1 -7; color: green"></a-entity>
+      <a-entity id="link13" line="start: 2 1 -3; end: 4 1 -5; color: green"></a-entity>
+      
+      <!-- Interaction -->
+      <a-entity cursor="rayOrigin: mouse"></a-entity>
+      
+      <!-- Événements -->
+      <script>
+        document.querySelectorAll('[draggable]').forEach(node => {
+          node.addEventListener('drag', (event) => {
+            const newPosition = event.detail.intersection.point;
+            node.setAttribute('position', newPosition);
+            updateLinks();
+          });
+        });
+        
+        function updateLinks() {
+          const node1Position = document.querySelector('#node1').getAttribute('position');
+          const node2Position = document.querySelector('#node2').getAttribute('position');
+          const node3Position = document.querySelector('#node3').getAttribute('position');
+          const node4Position = document.querySelector('#node4').getAttribute('position');
+          const node5Position = document.querySelector('#node5').getAttribute('position');
+          const node6Position = document.querySelector('#node6').getAttribute('position');
+          const node7Position = document.querySelector('#node7').getAttribute('position');
+          const node8Position = document.querySelector('#node8').getAttribute('position');
+          const node9Position = document.querySelector('#node9').getAttribute('position');
+          const node10Position = document.querySelector('#node10').getAttribute('position');
+          
+          // Mettre à jour les liens
+          document.querySelector('#link1').setAttribute('line', `start: ${node1Position.x} ${node1Position.y} ${node1Position.z}; end: ${node2Position.x} ${node2Position.y} ${node2Position.z}; color: green`);
+          document.querySelector('#link2').setAttribute('line', `start: ${node2Position.x} ${node2Position.y} ${node2Position.z}; end: ${node3Position.x} ${node3Position.y} ${node3Position.z}; color: green`);
+          document.querySelector('#link3').setAttribute('line', `start: ${node4Position.x} ${node4Position.y} ${node4Position.z}; end: ${node5Position.x} ${node5Position.y} ${node5Position.z}; color: green`);
+          document.querySelector('#link4').setAttribute('line', `start: ${node5Position.x} ${node5Position.y} ${node5Position.z}; end: ${node6Position.x} ${node6Position.y} ${node6Position.z}; color: green`);
+          document.querySelector('#link5').setAttribute('line', `start: ${node1Position.x} ${node1Position.y} ${node1Position.z}; end: ${node4Position.x} ${node4Position.y} ${node4Position.z}; color: green`);
+          document.querySelector('#link6').setAttribute('line', `start: ${node2Position.x} ${node2Position.y} ${node2Position.z}; end: ${node5Position.x} ${node5Position.y} ${node5Position.z}; color: green`);
+          document.querySelector('#link7').setAttribute('line', `start: ${node3Position.x} ${node3Position.y} ${node3Position.z}; end: ${node6Position.x} ${node6Position.y} ${node6Position.z}; color: green`);
+          document.querySelector('#link8').setAttribute('line', `start: ${node4Position.x} ${node4Position.y} ${node4Position.z}; end: ${node7Position.x} ${node7Position.y} ${node7Position.z}; color: green`);
+          document.querySelector('#link9').setAttribute('line', `start: ${node5Position.x} ${node5Position.y} ${node5Position.z}; end: ${node8Position.x} ${node8Position.y} ${node8Position.z}; color: green`);
+          document.querySelector('#link10').setAttribute('line', `start: ${node6Position.x} ${node6Position.y} ${node6Position.z}; end: ${node9Position.x} ${node9Position.y} ${node9Position.z}; color: green`);
+          document.querySelector('#link11').setAttribute('line', `start: ${node7Position.x} ${node7Position.y} ${node7Position.z}; end: ${node8Position.x} ${node8Position.y} ${node8Position.z}; color: green`);
+          document.querySelector('#link12').setAttribute('line', `start: ${node8Position.x} ${node8Position.y} ${node8Position.z}; end: ${node9Position.x} ${node9Position.y} ${node9Position.z}; color: green`);
+          document.querySelector('#link13').setAttribute('line', `start: ${node3Position.x} ${node3Position.y} ${node3Position.z}; end: ${node10Position.x} ${node10Position.y} ${node10Position.z}; color: green`);
+        }
+      </script>
+      
+      <!-- Éclairage -->
+      <a-light type="ambient" color="#333"></a-light>
+      <a-light type="point" intensity="2" position="2 4 4"></a-light>
+    </a-scene>
+  </body>
+</html>
